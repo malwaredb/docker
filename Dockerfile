@@ -46,15 +46,14 @@ RUN apt-get remove -y postgresql-server-dev-15 libfuzzy-dev cmake make build-ess
 RUN apt-get remove -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libprotobuf-c-dev libprotobuf-dev libcrypt-dev
 RUN apt-get autoremove -y && apt-get clean
 
-# Create some directories for MalwareDB's data
-RUN mkdir /malwaredb
-RUN mkdir /malwaredb/database && chown postgres:postgres /malwaredb/database
-RUN mkdir /malwaredb/samples
+ENV PGDATA /var/lib/postgresql/data
+RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA"
+VOLUME /var/lib/postgresql/data
+RUN mkdir /malware_samples
+VOLUME /malware_samples
 
-COPY initialize.sh .
 COPY start.sh .
-
-RUN chmod +x initialize.sh start.sh
+RUN chmod +x start.sh
 
 # Start MalwareDB
 ENTRYPOINT ["./start.sh"]

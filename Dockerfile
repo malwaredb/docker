@@ -1,12 +1,11 @@
 MAINTAINER Richard Zak <info@malwaredb.net>
 LABEL SOURCE="https://github.com/malwaredb/"
-EXPOSE 8080/tcp
-FROM debian:bookworm
+FROM debian:bookworm-slim
 
 # Install things we need for compilation
 RUN apt-get update && apt-get dist-upgrade -y
-RUN apt-get install -y postgresql-15 postgresql-server-dev-15 sudo libfuzzy2 libfuzzy-dev cmake make build-essential git curl libssl-dev libgomp1
-RUN apt-get install -y protobuf-c-compiler protobuf-compiler libprotobuf-c-dev libprotobuf-c1 libprotobuf-dev libprotobuf32 libcrypt-dev libcrypt1
+RUN apt-get install -y postgresql-15 postgresql-server-dev-15 sudo libfuzzy2 libfuzzy-dev cmake make build-essential git curl libssl-dev libssl3 libgomp1
+RUN apt-get install -y protobuf-c-compiler protobuf-compiler libprotobuf-c-dev libprotobuf-c1 libprotobuf-dev libprotoc32 libprotobuf32 libcrypt-dev libcrypt1
 RUN apt-get install -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0
 
 # Install Rust
@@ -42,9 +41,9 @@ RUN rm -rf sdhash_psql
 
 # End: cleanup
 # Don't need to bloat the image with development tools once we're done with them
-RUN apt-get remove -y postgresql-server-dev-15 libfuzzy-dev cmake make build-essential git curl
+RUN apt-get remove -y postgresql-server-dev-15 libfuzzy-dev cmake make build-essential git curl libssl-dev protobuf-c-compiler protobuf-compiler
 RUN apt-get remove -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libprotobuf-c-dev libprotobuf-dev libcrypt-dev
-RUN apt-get autoremove -y && apt-get clean
+RUN apt-get autoremove -y && apt-get clean && rm -rf $HOME/.cargo $HOME/.rustup
 
 ENV PGDATA /var/lib/postgresql/data
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA"
@@ -55,5 +54,10 @@ VOLUME /malware_samples
 COPY start.sh .
 RUN chmod +x start.sh
 
-# Start MalwareDB
+# Start MalwareDB, and do initial setup for Postgres
 ENTRYPOINT ["./start.sh"]
+
+# For fast shutdown mode for Postgres
+# https://github.com/docker-library/postgres/blob/dd68d91377a3631b36a23f2e4795f6189db4ba12/15/bullseye/Dockerfile#L188
+STOPSIGNAL SIGINT
+EXPOSE 8080/tcp

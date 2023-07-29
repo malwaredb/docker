@@ -1,6 +1,6 @@
 MAINTAINER Richard Zak <info@malwaredb.net>
 LABEL SOURCE="https://github.com/malwaredb/"
-EXPOSE 8080
+EXPOSE 8080/tcp
 FROM debian:bookworm
 
 # Install things we need for compilation
@@ -44,22 +44,17 @@ RUN rm -rf sdhash_psql
 # Don't need to bloat the image with development tools once we're done with them
 RUN apt-get remove -y postgresql-server-dev-15 libfuzzy-dev cmake make build-essential git curl
 RUN apt-get remove -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libprotobuf-c-dev libprotobuf-dev libcrypt-dev
-RUN apt-get autoremove -y
+RUN apt-get autoremove -y && apt-get clean
 
 # Create some directories for MalwareDB's data
 RUN mkdir /malwaredb
 RUN mkdir /malwaredb/database && chown postgres:postgres /malwaredb/database
 RUN mkdir /malwaredb/samples
 
-# Setup Postgres
-RUN /etc/init.d/postgresql start && sudo -u postgres psql --command "CREATE USER malwaredb WITH PASSWORD 'malwaredb';" && \
-  sudo -u postgres psql --command "CREATE TABLESPACE malwaredb OWNER malwaredb LOCATION '/malwaredb/database';" && \
-  sudo -u postgres psql --command "CREATE DATABASE malwaredb OWNER malwaredb TABLESPACE 'malwaredb';" && \
-# Add extensions
-  sudo -u postgres psql --command "CREATE OR REPLACE FUNCTION fuzzy_hash_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_hash_compare' LANGUAGE 'c';" && \
-  sudo -u postgres psql --command "CREATE OR REPLACE FUNCTION tlsh_compare(TEXT, TEXT) RETURNS INTEGER AS 'tlsh_psql.so', 'pg_tlsh_compare' LANGUAGE 'c';" && \
-  sudo -u postgres psql --command "CREATE OR REPLACE FUNCTION sdhash_compare(TEXT, TEXT) RETURNS INTEGER AS 'sdhash_psql.so', 'pg_sdhash_compare' LANGUAGE 'c';" && \
-  sudo -u postgres psql --command "CREATE OR REPLACE FUNCTION lzjd_compare(TEXT, TEXT) RETURNS INTEGER AS 'lzjd_psql.so', 'pg_lzjd_compare' LANGUAGE 'c';"
+COPY initialize.sh .
+COPY start.sh .
+
+RUN chmod +x initialize.sh start.sh
 
 # Start MalwareDB
-ENTRYPOINT ["/usr/bin/mdb_server", "run", "config", "-p", "8080", "--dir", "/malwaredb/samples", "--db", "postgres user=malwaredb password=malwaredb dbname=malwaredb host=localhost", "-m", "1 GB"]
+ENTRYPOINT ["./start.sh"]

@@ -60,6 +60,10 @@ RUN apt-get remove -y postgresql-server-dev-15 libfuzzy-dev cmake make build-ess
 RUN apt-get remove -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libprotobuf-c-dev libprotobuf-dev libcrypt-dev
 RUN apt-get autoremove -y && apt-get clean
 
+# Ensure postgres apps are reachable
+ENV PG_MAJOR 15
+ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
+
 # Allow external connections
 # https://github.com/docker-library/postgres/blob/25b3034e9b0155c3e71acaf650243e7d12a571c1/15/bullseye/Dockerfile
 RUN set -eux; \

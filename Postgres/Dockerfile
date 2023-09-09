@@ -65,9 +65,7 @@ ENV PG_MAJOR 15
 ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
 
 # Allow external connections
-# https://github.com/docker-library/postgres/blob/25b3034e9b0155c3e71acaf650243e7d12a571c1/15/bullseye/Dockerfile
-RUN set -eux; \
-    sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /etc/postgresql/15/main/postgresql.conf
+RUN echo "listen_addresses='*'" >> /etc/postgresql/15/main/postgresql.conf
 
 ENV PGDATA /var/lib/postgresql/data
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA"

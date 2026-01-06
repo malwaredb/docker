@@ -1,8 +1,6 @@
-name: Docker MalwareDB & Postgres
+name: Docker Postgres
 
 on:
-  schedule:
-    - cron: '23 59 30 * *'
   push:
     branches: [ "main" ]
     # Publish semver tags as releases.
@@ -12,7 +10,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: malwaredb/malwaredb
+  IMAGE_NAME: malwaredb/postgres
 
 jobs:
   build:
@@ -63,7 +61,6 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 #v6.18.0
         with:
-          context: MalwareDB
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

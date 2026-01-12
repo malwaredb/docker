@@ -1,6 +1,6 @@
 ## Dockerfile for Postgres for MalwareDB
 
-This Docker file builds extensions for Postgres on Debian for use with MalwareDB.
+This *experimental* Docker file builds extensions for Postgres on Debian for use with MalwareDB. Please see [Docker Postgres](https://hub.docker.com/_/postgres/) for more information.
 
 ### Postgres Extensions
 Postgres is installed, and extensions built with extensions for:
@@ -16,8 +16,8 @@ To use the extensions, __you__ have to add them to __each__ database schema you 
 Be sure to set the admin password for Postgres via the `POSTGRES_PASSWORD` environment variable, shown below.
 
 ```
-$ git clone https://github.com/malwaredb/docker.git
+$ git clone https://github.com/malwaredb/pg_docker.git
 $ docker build -t postgres-similarity/latest .
 $ mkdir pg_data
-$ docker run -v `pwd`/pg_data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=yoursecurepassword postgres-similarity/latest
+$ docker run -v `pwd`/pg_data:/var/lib/postgresql/18/data -p 5432:5432 -e POSTGRES_PASSWORD=yoursecurepassword postgres-similarity/latest
 ```

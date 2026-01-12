@@ -3,6 +3,8 @@ LABEL MAINTAINER="Richard Zak <richard@malwaredb.net>"
 LABEL org.opencontainers.image.authors=richard@malwaredb.net
 LABEL SOURCE="https://github.com/malwaredb/docker/"
 LABEL org.opencontainers.image.source=https://github.com/malwaredb/docker/
+LABEL org.opencontainers.image.description="Postgres 18 on Debian Trixie with similarity extensions installed intended for use with MalwareDB"
+LABEL org.opencontainers.image.licenses=Apache-2.0
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install things we need for compilation

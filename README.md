@@ -3,7 +3,7 @@
 This *experimental* Docker file builds extensions for Postgres on Debian for use with MalwareDB. Please see [Docker Postgres](https://hub.docker.com/_/postgres/) for more information.
 
 ### Postgres Extensions
-Postgres is installed, and extensions built with extensions for:
+Postgres is installed with extensions for:
 * [LZJD](https://github.com/malwaredb/LZJD)
 * [SSDeep](https://github.com/malwaredb/ssdeep_psql)
 * [TLSH](https://github.com/malwaredb/tlsh_pg)
